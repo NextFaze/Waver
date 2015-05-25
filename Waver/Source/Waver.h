@@ -13,11 +13,9 @@
 
 @property (nonatomic, copy) void (^waverLevelCallback)(Waver * waver);
 
-//
-
 @property (nonatomic) NSUInteger numberOfWaves;
 
-@property (nonatomic) UIColor * waveColor;
+@property (nonatomic) NSArray *waveColors;
 
 @property (nonatomic) CGFloat level;
 
@@ -34,8 +32,6 @@
 @property (nonatomic) CGFloat density;
 
 @property (nonatomic) CGFloat phaseShift;
-
-//
 
 @property (nonatomic, readonly) NSMutableArray * waves;
 

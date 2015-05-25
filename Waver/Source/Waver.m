@@ -49,7 +49,6 @@
 
 - (void)setup
 {
-    
     self.waves = [NSMutableArray new];
     
     self.frequency = 1.2f;
@@ -61,11 +60,11 @@
     self.phaseShift = -0.25f;
     self.density = 1.f;
     
-    self.waveColor = [UIColor whiteColor];
+    self.waveColors = @[(id)[UIColor redColor].CGColor, (id)[UIColor purpleColor].CGColor];
     self.mainWaveWidth = 2.0f;
     self.decorativeWavesWidth = 1.0f;
     
-	self.waveHeight = CGRectGetHeight(self.bounds);
+    self.waveHeight = CGRectGetHeight(self.bounds);
     self.waveWidth  = CGRectGetWidth(self.bounds);
     self.waveMid    = self.waveWidth / 2.0f;
     self.maxAmplitude = self.waveHeight - 4.0f;
@@ -87,12 +86,18 @@
         [waveline setLineWidth:(i==0 ? self.mainWaveWidth : self.decorativeWavesWidth)];
         CGFloat progress = 1.0f - (CGFloat)i / self.numberOfWaves;
         CGFloat multiplier = MIN(1.0, (progress / 3.0f * 2.0f) + (1.0f / 3.0f));
-		UIColor *color = [self.waveColor colorWithAlphaComponent:(i == 0 ? 1.0 : 1.0 * multiplier * 0.4)];
-		waveline.strokeColor = color.CGColor;
-        [self.layer addSublayer:waveline];
+        UIColor *color = [[UIColor blackColor] colorWithAlphaComponent:(i == 0 ? 1.0 : 1.0 * multiplier * 0.4)];
+        waveline.strokeColor = color.CGColor;
         [self.waves addObject:waveline];
+        
+        CAGradientLayer *gradientLayer = [CAGradientLayer layer];
+        gradientLayer.startPoint = CGPointMake(0.0, 0.5);
+        gradientLayer.endPoint = CGPointMake(1.0, 0.5);
+        gradientLayer.frame = self.bounds;
+        gradientLayer.colors = self.waveColors;
+        [gradientLayer setMask:waveline];
+        [self.layer addSublayer:gradientLayer];
     }
-    
 }
 
 -(void)invokeWaveCallback {
@@ -112,22 +117,22 @@
 
 - (void)updateMeters
 {
-	self.waveHeight = CGRectGetHeight(self.bounds);
-	self.waveWidth  = CGRectGetWidth(self.bounds);
-	self.waveMid    = self.waveWidth / 2.0f;
-	self.maxAmplitude = self.waveHeight - 4.0f;
-	
+    self.waveHeight = CGRectGetHeight(self.bounds);
+    self.waveWidth  = CGRectGetWidth(self.bounds);
+    self.waveMid    = self.waveWidth / 2.0f;
+    self.maxAmplitude = self.waveHeight / 2.0f;
+    
     UIGraphicsBeginImageContext(self.frame.size);
     
     for(int i=0; i < self.numberOfWaves; i++) {
-
+        
         
         UIBezierPath *wavelinePath = [UIBezierPath bezierPath];
-
+        
         // Progress is a value between 1.0 and -0.5, determined by the current wave idx, which is used to alter the wave's amplitude.
         CGFloat progress = 1.0f - (CGFloat)i / self.numberOfWaves;
         CGFloat normedAmplitude = (1.5f * progress - 0.5f) * self.amplitude;
-
+        
         
         for(CGFloat x = 0; x<self.waveWidth + self.density; x += self.density) {
             
@@ -147,8 +152,8 @@
         
         CAShapeLayer *waveline = [self.waves objectAtIndex:i];
         waveline.path = [wavelinePath CGPath];
-
-
+        
+        
         
     }
     
@@ -158,13 +163,5 @@
 - (void)dealloc {
     [_displaylink invalidate];
 }
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
-*/
 
 @end
